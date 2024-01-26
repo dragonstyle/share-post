@@ -24,6 +24,7 @@ Simply place the shortcode where you'd like placeholder content to be generated.
 Share-post currently supports the following services, and should generate a formatted, embedded post from them.
 
 - Mastodon
+- LinkedIn
 - Threads
 - Instagram
 - Pinterest

@@ -13,6 +13,7 @@ local urlPattern = "(https?://[%w%$%-%_%.%+%!%*%'%(%)%:%%]+/)(.+)"
 
 local alignmentStyles = [[
 <style>
+.linked-post,
 .text-post-media,
 .pinterest-rendered,
 .twitter-tweet-rendered,
@@ -75,6 +76,28 @@ local handlers = {
             return nil
         end
     end,    
+    ['linkedin'] = function(urlData)
+        if urlData.base:find("linkedin.com") then
+
+            local pattern = "(%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d+)"
+            local id = urlData.path:match(pattern)
+            if (id) then
+                -- https://www.linkedin.com/posts/posit-software_quarto-quarto-14-activity-7156030921387778049-dHKD?utm_source=share&utm_medium=member_desktop
+                local iframe = '<iframe class="linked-post" src="https://www.linkedin.com/embed/feed/update/urn:li:activity:' .. id .. '" height="1062" width="504" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>'
+                return {
+                    block = pandoc.RawBlock("html", iframe),
+                    [kAfterBody] = '<script src="' .. urlData.base .. 'embed.js" async="async"></script>',
+                    [kInHeader] = alignmentStyles
+                } 
+            else
+
+                return nil
+            end
+        else
+            return nil
+        end
+    end,    
+
     ['mastodon'] = function(urlData)
         if urlData.base:find("mastodon") then
             local iframe = '<iframe src="' .. urlData.url .. '/embed" class="mastodon-embed" style="max-width: 100%; border: 0;" width="400" allowfullscreen="allowfullscreen"></iframe>'
