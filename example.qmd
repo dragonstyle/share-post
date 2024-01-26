@@ -6,7 +6,13 @@ format: html
 
 ## Example
 
-The following document provides a simple example of embedding a Mastodon post. Currently the only supported arguments are the URL to the post to be shared.
+The following document provides a simple example of embedding a Mastodon post. Currently the only supported arguments are the URL to the post to be shared. Use a simple shortcode to embed a post. For example, the shortcode:
+
+```markdown
+{{< share-post https://sciencemastodon.com/@gdyson/111371030805595929 >}}
+```
+
+produces:
 
 {{< share-post https://sciencemastodon.com/@gdyson/111371030805595929 >}}
 
