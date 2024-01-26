@@ -2,6 +2,8 @@ local kAfterBody = "after-body"
 local kInHeader = "in-header"
 local kBeforeBody = "before-body"
 
+local kUsePackages = "packages"
+
 local urlPattern = "(https?://[%w%$%-%_%.%+%!%*%'%(%)%:%%]+/)(.+)"
 
 -- TODO: Support alignment
@@ -33,11 +35,22 @@ local function parseUrl(url)
     }
 end
 
+local beginInlines = { pandoc.RawInline('latex', '\\begin{tcolorbox}[]\n') }
+local endInlines = { pandoc.RawInline('latex', '\n\\end{tcolorbox}') }
 
--- \faLinkedinSquare
--- \faInstagram
--- \faTwitterSquare
--- \faPinterestSquare
+local function makeBox(text, url, icon) 
+    return pandoc.Div(pandoc.List({
+        beginInlines,
+        pandoc.RawInline('latex', '{' .. icon .. '}'),
+        pandoc.Link(text,url),
+        endInlines
+    }))
+end
+
+local boxPackages = {
+    "tcolorbox",
+    "fontawesome5"
+}
 
 local threads = {
     canHandle = function(urlData)
@@ -54,7 +67,8 @@ local threads = {
         end,
         latex = function(urlData)
             return {
-                block=pandoc.Link("Embedded Threads Post", urlData.url)
+                block=makeBox("Embedded Threads Post", urlData.url, "\\faShareSquare"),
+                [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
@@ -79,7 +93,9 @@ local instagram = {
         end,
         latex = function(urlData)
             return {
-                block=pandoc.Link("Embedded Instagram Post", urlData.url)
+                block=makeBox("Embedded Instagram Post", urlData.url, "\\faInstagram"),
+                [kUsePackages] = boxPackages
+
             }
         end,
         other = function(urlData)
@@ -104,7 +120,8 @@ local twitter = {
         end,
         latex = function(urlData)
             return {
-                block=pandoc.Link("Embedded Twitter Post", urlData.url)
+                block=makeBox("Embedded Twitter Post", urlData.url, "\\faTwitterSquare"),
+                [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
@@ -132,7 +149,8 @@ local pinterest = {
         end,
         latex = function(urlData)
             return {
-                block=pandoc.Link("Embedded Pinterest Post", urlData.url)
+                block=makeBox("Embedded Pinterest Post", urlData.url, "\\faPinterestSquare"),
+                [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
@@ -165,7 +183,8 @@ local linkedin = {
         end,
         latex = function(urlData)
             return {
-                block=pandoc.Link("Embedded LinkedIn Post", urlData.url)
+                block=makeBox("Embedded LinkedIn Post", urlData.url, "\\faLinkedin"),
+                [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
@@ -191,7 +210,8 @@ local mastodon = {
         end,
         latex = function(urlData)
             return {
-                block=pandoc.Link("Embedded Mastodon Post", urlData.url)
+                block=makeBox("Embedded Mastodon Post", urlData.url, "\\faMastodon"),
+                [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
@@ -215,40 +235,39 @@ return {
     ['share-post'] = function(args, kwargs, meta)
         local result_block
         local url = args[1]
-        if quarto.doc.is_format("html") then
-            -- html output
-            local urlData = parseUrl(url)
-            for i,handler in ipairs(handlers) do
+        -- html output
+        local urlData = parseUrl(url)
+        for i,handler in ipairs(handlers) do
 
-                if handler.canHandle(urlData) then 
+            if handler.canHandle(urlData) then 
 
-                    local make_result = handler.handle.other
-                    if quarto.doc.is_format("html") then
-                        make_result = handler.handle.html
-                    elseif quarto.doc.is_format("pdf") then
-                        make_result = handler.handle.latex
-                    end
+                local make_result = handler.handle.other
+                if quarto.doc.is_format("html") then
+                    make_result = handler.handle.html
+                elseif quarto.doc.is_format("pdf") then
+                    make_result = handler.handle.latex
+                end
 
-                    -- return the raw html block
-                    local result = make_result(urlData)
-                    result_block = result.block
-                    
-                    -- inject dependencies
-                    if result[kInHeader] ~= nil then
-                        quarto.doc.include_text(kInHeader, result[kInHeader])
-                    end
-                    if result[kBeforeBody] ~= nil then
-                        quarto.doc.include_text(kBeforeBody, result[kBeforeBody])
-                    end
-                    if result[kAfterBody] ~= nil then
-                        quarto.doc.include_text(kAfterBody, result[kAfterBody])
+                -- return the raw html block
+                local result = make_result(urlData)
+                result_block = result.block
+                
+                -- inject dependencies
+                if result[kInHeader] ~= nil then
+                    quarto.doc.include_text(kInHeader, result[kInHeader])
+                end
+                if result[kBeforeBody] ~= nil then
+                    quarto.doc.include_text(kBeforeBody, result[kBeforeBody])
+                end
+                if result[kAfterBody] ~= nil then
+                    quarto.doc.include_text(kAfterBody, result[kAfterBody])
+                end
+                if result[kUsePackages] ~= nil then
+                    for _i,v in ipairs(result[kUsePackages]) do
+                        quarto.doc.use_latex_package(v)
                     end
                 end
             end
-        else
-            -- Non-html output, just create a link
-            local inlines = pandoc.Inlines({pandoc.RawInline("latex", "{\faLinkedinSquare}")})
-            result_block = pandoc.Link("Embedded Post", url)
         end
         return result_block
     end
