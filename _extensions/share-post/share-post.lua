@@ -195,7 +195,7 @@ local linkedin = {
 
 local mastodon = {
     canHandle = function(urlData)
-        return urlData.base:find("mastodon")
+        return urlData.path:find("@[%w._-]+/%d%d%d%d%d%d*")
     end,
     handle = {
         html = function(urlData)
@@ -267,6 +267,9 @@ return {
                 end
             end
         end
-        return result_block
+        if result_block == nil then
+            quarto.log.warning("Unable to resolve post url " .. url .. "\nNo post was embedded.")
+        end
+        return result_block or {}
     end
 }
