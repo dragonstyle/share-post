@@ -24,7 +24,7 @@ In addition to Mastodon, the short will render posts for Twitter, Threads, Instr
 For example:
 
 ```markdown
-{{{< https://www.linkedin.com/posts/posit-software_quarto-quarto-14-activity-7156030921387778049-dHKD >}}}
+{{{< share-post https://www.linkedin.com/posts/posit-software_quarto-quarto-14-activity-7156030921387778049-dHKD >}}}
 ```
 
 produces:
