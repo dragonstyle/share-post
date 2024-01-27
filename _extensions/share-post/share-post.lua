@@ -35,15 +35,13 @@ local function parseUrl(url)
     }
 end
 
-local beginInlines = { pandoc.RawInline('latex', '\\begin{tcolorbox}[]\n') }
-local endInlines = { pandoc.RawInline('latex', '\n\\end{tcolorbox}') }
 
-local function makeBox(text, url, icon) 
+local function makeBox(text, url, icon, color) 
     return pandoc.Div(pandoc.List({
-        beginInlines,
-        pandoc.RawInline('latex', '{' .. icon .. '}'),
-        pandoc.Link(text,url),
-        endInlines
+        pandoc.RawInline('latex', '\\begin{centering}\\begin{tcolorbox}[hbox,\ncolframe=lightgray,\ncolback=white]\n'),
+        pandoc.RawInline('latex', '\\textcolor{' .. color .. '}{{\\Large {' .. icon .. '}}} %'),
+        pandoc.Link(pandoc.RawInline("latex", '\\raisebox{0.1 em}{' .. text .. '}'),url),
+        pandoc.RawInline('latex', '\n\\end{tcolorbox}\\end{centering}\n\\vspace{1em}')
     }))
 end
 
@@ -67,13 +65,13 @@ local threads = {
         end,
         latex = function(urlData)
             return {
-                block=makeBox("Embedded Threads Post", urlData.url, "\\faShareSquare"),
+                block=makeBox("Click to view embedded Threads post.", urlData.url, "\\faShareSquare", "black"),
                 [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
             return {
-                block=pandoc.Link("Embedded Threads Post", urlData.url)
+                block=pandoc.Link("Click to view embedded Threads post.", urlData.url)
             }
         end
     }
@@ -93,14 +91,14 @@ local instagram = {
         end,
         latex = function(urlData)
             return {
-                block=makeBox("Embedded Instagram Post", urlData.url, "\\faInstagram"),
+                block=makeBox("Click to view embedded Instagram post.", urlData.url, "\\faInstagram", "RubineRed"),
                 [kUsePackages] = boxPackages
 
             }
         end,
         other = function(urlData)
             return {
-                block=pandoc.Link("Embedded Instagram Post", urlData.url)
+                block=pandoc.Link("Click to view embedded Instagram post.", urlData.url)
             }
         end
     }
@@ -120,13 +118,13 @@ local twitter = {
         end,
         latex = function(urlData)
             return {
-                block=makeBox("Embedded Twitter Post", urlData.url, "\\faTwitterSquare"),
+                block=makeBox("Click to view embedded Twitter post.", urlData.url, "\\faTwitterSquare", "ProcessBlue"),
                 [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
             return {
-                block=pandoc.Link("Embedded Twitter Post", urlData.url)
+                block=pandoc.Link("Click to view embedded Twitter post.", urlData.url)
             }
         end
     }
@@ -149,13 +147,13 @@ local pinterest = {
         end,
         latex = function(urlData)
             return {
-                block=makeBox("Embedded Pinterest Post", urlData.url, "\\faPinterestSquare"),
+                block=makeBox("Click to view embedded Pinterest post.", urlData.url, "\\faPinterestSquare", "red"),
                 [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
             return {
-                block=pandoc.Link("Embedded Pinterest Post", urlData.url)
+                block=pandoc.Link("Click to view embedded Pinterest post.", urlData.url)
             }
         end
     }
@@ -183,13 +181,13 @@ local linkedin = {
         end,
         latex = function(urlData)
             return {
-                block=makeBox("Embedded LinkedIn Post", urlData.url, "\\faLinkedin"),
+                block=makeBox("Click to view embedded LinkedIn post.", urlData.url, "\\faLinkedin", "RoyalBlue"),
                 [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
             return {
-                block=pandoc.Link("Embedded LinkedIn Post", urlData.url)
+                block=pandoc.Link("Click to view embedded LinkedIn post.", urlData.url)
             }
         end
     }
@@ -210,13 +208,13 @@ local mastodon = {
         end,
         latex = function(urlData)
             return {
-                block=makeBox("Embedded Mastodon Post", urlData.url, "\\faMastodon"),
+                block=makeBox("Click to view embedded Mastodon post.", urlData.url, "\\faMastodon", "Orchid"),
                 [kUsePackages] = boxPackages
             }
         end,
         other = function(urlData)
             return {
-                block=pandoc.Link("Embedded Mastodon Post", urlData.url)
+                block=pandoc.Link("Click to view embedded Mastodon post.", urlData.url)
             }
         end
     }

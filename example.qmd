@@ -3,7 +3,8 @@ title: Share-post Example
 author: Charles Teague
 format: 
   html: default
-  pdf: default
+  pdf:
+    keep-tex: true
 ---
 
 ## Example
